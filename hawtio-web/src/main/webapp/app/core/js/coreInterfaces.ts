@@ -12,6 +12,22 @@ module Core {
   }
 
   /**
+   * Response from UserDetails request
+   */
+  export interface UserDetailsResponse {
+    username: string;
+    keycloakEnabled: boolean;
+  }
+
+  /**
+   * Info related to keycloak integration
+   */
+  export interface KeycloakContext {
+    enabled: boolean;
+    keycloak: KeycloakModule.IKeycloak;
+  }
+
+  /**
    * Typescript interface that represents the options needed to connect to another JVM
    */
   export interface ConnectToServerOptions {
@@ -25,6 +41,7 @@ module Core {
     password: String;
     view: String;
     name: String;
+    useKeycloak: boolean;
   }
 
   /**
@@ -53,7 +70,8 @@ module Core {
       userName: null,
       password: null,
       view: null,
-      name: null
+      name: null,
+      useKeycloak: false
     };
     var opts = options || {};
     return angular.extend(defaults, opts);

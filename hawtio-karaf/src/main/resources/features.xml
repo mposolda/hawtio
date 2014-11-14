@@ -109,4 +109,9 @@
     <bundle>mvn:io.hawt/hawtio-fabric8-branding/${project.version}/war</bundle>
   </feature>
 
+  <feature name="hawtio-keycloak" version="${project.version}" resolver="(obr)">
+    <details>The keycloak and hawtio integration</details>
+    <bundle>mvn:io.hawt/hawtio-keycloak/${project.version}</bundle>
+  </feature>
+
 </features>

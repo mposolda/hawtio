@@ -1,0 +1,121 @@
+{
+    "realm" : "demo",
+    "accessTokenLifespan" : 300,
+    "ssoSessionIdleTimeout" : 1800,
+    "ssoSessionMaxLifespan" : 36000,
+    "accessCodeLifespan" : 60,
+    "accessCodeLifespanUserAction" : 300,
+    "enabled" : true,
+    "sslRequired" : "external",
+    "passwordCredentialGrantAllowed" : true,
+    "registrationAllowed" : false,
+    "rememberMe" : false,
+    "verifyEmail" : false,
+    "resetPasswordAllowed" : false,
+    "social" : false,
+    "updateProfileOnInitialSocialLogin" : false,
+    "bruteForceProtected" : false,
+    "roles" : {
+        "realm": [
+            { "name": "admin" },
+            { "name": "viewer" }
+        ]
+    },
+    "requiredCredentials" : [ "password" ],
+    "users" : [
+        {
+            "username" : "john",
+            "enabled" : true,
+            "credentials" : [
+                {
+                    "type" : "password",
+                    "value" : "password"
+                }
+            ],
+            "realmRoles" : [ "viewer" ],
+            "applicationRoles":  {
+                "account" : [ "view-profile", "manage-account" ]
+            }
+        },
+        {
+            "username" : "mary",
+            "enabled" : true,
+            "credentials" : [
+                {
+                    "type" : "password",
+                    "value" : "password"
+                }
+            ],
+            "applicationRoles":  {
+                "account" : [ "view-profile", "manage-account" ]
+            }
+        },
+        {
+            "username" : "root",
+            "enabled" : true,
+            "credentials" : [
+                {
+                    "type" : "password",
+                    "value" : "password"
+                }
+            ],
+            "realmRoles" : [ "admin" ],
+            "applicationRoles":  {
+                "account" : [ "view-profile", "manage-account" ]
+            }
+        }
+    ],
+    "applications" : [
+        {
+            "name" : "hawtio-client",
+            "surrogateAuthRequired" : false,
+            "enabled" : true,
+            "redirectUris" : [ "http://localhost:8080/hawtio/*", "http://localhost:8181/hawtio/*" ],
+            "webOrigins" : [ "http://localhost:8080", "http://localhost:8181" ],
+            "claims" : {
+                "name" : true,
+                "username" : true,
+                "profile" : true,
+                "picture" : true,
+                "website" : true,
+                "email" : true,
+                "gender" : true,
+                "locale" : true,
+                "address" : true,
+                "phone" : true
+            },
+            "bearerOnly" : false,
+            "publicClient" : true,
+            "protocol" : "openid-connect",
+            "fullScopeAllowed" : true
+        }
+    ],
+    "oauthClients": [
+        {
+            "name": "direct-auth-fuse-client",
+            "enabled": true,
+            "publicClient": false,
+            "directGrantsOnly": true,
+            "fullScopeAllowed" : true,
+            "claims" : {
+                "name" : true,
+                "username" : true,
+                "profile" : true,
+                "picture" : true,
+                "website" : true,
+                "email" : true,
+                "gender" : true,
+                "locale" : true,
+                "address" : true,
+                "phone" : true
+            },
+            "secret": "d9e299e3-c67c-42a8-a5dd-26c6654d65f7"
+        }
+    ],
+    "browserSecurityHeaders" : {
+        "contentSecurityPolicy" : "frame-src 'self'",
+        "xFrameOptions" : "SAMEORIGIN"
+    },
+    "eventsEnabled" : false,
+    "eventsListeners" : [ ]
+}

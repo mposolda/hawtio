@@ -101,10 +101,12 @@ public class SessionExpiryFilter implements Filter {
                 if (!enabled) {
                     LOG.debug("Authentication disabled, allowing request");
                     chain.doFilter(request, response);
+                } else if ("OPTIONS".equals(request.getMethod())) {
+                    LOG.debug("OPTIONS method used, allowing request");
+                    chain.doFilter(request, response);
                 } else {
                     if (subContext.equals("jolokia") ||
                         subContext.equals("proxy") ||
-                        subContext.equals("user") ||
                         subContext.equals("exportContext") ||
                         subContext.equals("contextFormatter") ||
                         subContext.equals("upload")) {

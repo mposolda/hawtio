@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>io.hawt</groupId>
+    <artifactId>project</artifactId>
+    <version>1.5-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>hawtio-keycloak</artifactId>
+  <packaging>bundle</packaging>
+  <name>${project.artifactId}</name>
+  <description>hawtio :: hawtio-keycloak-integration</description>
+
+  <properties>
+    <fuse.osgi.export>
+    </fuse.osgi.export>
+    <fuse.osgi.import>
+      org.apache.karaf.jaas.config,
+      *;resolution:=optional
+    </fuse.osgi.import>
+  </properties>
+
+  <dependencies>
+    <!-- TODO: Tomcat adapter itself is not used, but it brings all other needed deps -->
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-tomcat-core-adapter</artifactId>
+      <version>${keycloak.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>catalina</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${maven-bundle-plugin-version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <instructions>
+            <Embed-Directory>lib</Embed-Directory>
+            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Bundle-ClassPath>.</Bundle-ClassPath>
+            <Bundle-Name>${project.description}</Bundle-Name>
+            <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+            <Import-Package>${fuse.osgi.import}</Import-Package>
+            <Export-Package>${fuse.osgi.export}</Export-Package>
+            <Implementation-Title>hawtio</Implementation-Title>
+            <Implementation-Version>${project.version}</Implementation-Version>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

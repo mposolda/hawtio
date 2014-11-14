@@ -23,8 +23,15 @@ module Core {
       var password:String = null;
 
       if (connectionOptions) {
-        username = connectionOptions.userName;
-        password = connectionOptions.password;
+        if (connectionOptions.useKeycloak) {
+          // Take it from userDetails as we have username/password like Bearer/<kcAccessToken>
+          username = userDetails.username;
+          password = userDetails.password;
+        } else {
+          // TODO: This looks like a bug as connectionOptions.userName and connectionOptions.password are always null as they are deleted before saving to localStorage in Core.saveConnectionMap
+          username = connectionOptions.userName;
+          password = connectionOptions.password;
+        }
       } else if (angular.isDefined(userDetails) &&
                   angular.isDefined(userDetails.username) &&
                   angular.isDefined(userDetails.password)) {
@@ -42,12 +49,6 @@ module Core {
       if (username && password) {
         userDetails.username = username;
         userDetails.password = password;
-
-        $.ajaxSetup({
-          beforeSend: (xhr) => {
-            xhr.setRequestHeader('Authorization', Core.getBasicAuthHeader(<string>userDetails.username, <string>userDetails.password));
-          }
-        });
 
         var loginUrl = jolokiaUrl.replace("jolokia", "auth/login/");
         $.ajax(loginUrl, {
@@ -70,6 +71,9 @@ module Core {
           error: (xhr, textStatus, error) => {
             // silently ignore, we could be using the proxy
             Core.executePostLoginTasks();
+          },
+          beforeSend: (xhr) => {
+            xhr.setRequestHeader('Authorization', Core.getBasicAuthHeader(<string>userDetails.username, <string>userDetails.password));
           }
         });
 

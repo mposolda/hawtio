@@ -1,0 +1,9 @@
+{
+  "realm": "demo",
+  "auth-server-url": "http://localhost:8081/auth",
+  "ssl-required": "external",
+  "resource": "direct-auth-fuse-client",
+  "credentials": {
+    "secret": "d9e299e3-c67c-42a8-a5dd-26c6654d65f7"
+  }
+}

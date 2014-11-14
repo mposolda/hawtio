@@ -62,6 +62,11 @@ module Core {
     return Core.preLogoutTasks;
   });
 
+  // service to register stuff that should happen after the user logs out
+  _module.factory('postLogoutTasks', () => {
+    return Core.postLogoutTasks;
+  });
+
   // help registry for registering help topics/pages to
   _module.factory('helpRegistry', ["$rootScope", ($rootScope) => {
     return new Core.HelpRegistry($rootScope);
@@ -153,6 +158,7 @@ module Core {
 
   // user detail service, contains username/password
   _module.factory('userDetails', ["ConnectOptions", "localStorage", "$window", "$rootScope", (ConnectOptions:Core.ConnectOptions, localStorage:WindowLocalStorage, $window:ng.IWindowService, $rootScope:ng.IRootScopeService)  => {
+
     var answer = <UserDetails> {
       username: null,
       password: null
@@ -178,18 +184,18 @@ module Core {
       var userUrl = "user";
       $.ajax(userUrl, <JQueryAjaxSettings> {
         type: "GET",
-        success: (response) => {
+        success: (response: UserDetailsResponse) => {
           log.debug("Got user response: ", response);
-          if (response === null) {
+          if (response === null || response.username.trim().length === 0) {
             answer.username = null;
             answer.password = null;
-            log.debug("user response was null, no session available");
+            log.debug("user response or username was null, no session available");
             Core.$apply($rootScope);
             return;
           }
-          answer.username = response;
+          answer.username = response.username;
           // 'user' is what the UserServlet returns if authenticationEnabled is off
-          if (response === 'user') {
+          if (response.username === 'user') {
             log.debug("Authentication disabled, using dummy credentials");
             // use a dummy login details
             answer.loginDetails = {};
