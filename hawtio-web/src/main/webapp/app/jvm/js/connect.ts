@@ -15,6 +15,7 @@ module JVM {
     forms: any;
     disableProxy: boolean;
     lastConnection: string;
+    keycloakEnabled: boolean;
     connectionConfigs: Core.ConnectionMap;
     currentConfig: Core.ConnectOptions;
     formConfig: Forms.FormConfiguration;
@@ -24,7 +25,7 @@ module JVM {
     gotoServer: (options?:Core.ConnectOptions, form?:JQueryStatic, save?:boolean) => void;
   }
 
-  export var ConnectController = _module.controller("JVM.ConnectController", ["$scope", "$location", "localStorage", "workspace", ($scope:ConnectControllerScope, $location:ng.ILocationService, localStorage:WindowLocalStorage, workspace:Core.Workspace) => {
+  export var ConnectController = _module.controller("JVM.ConnectController", ["$scope", "$location", "localStorage", "workspace", "keycloakContext", ($scope:ConnectControllerScope, $location:ng.ILocationService, localStorage:WindowLocalStorage, workspace:Core.Workspace, keycloakContext:Core.KeycloakContext) => {
 
     function newConfig() {
       return Core.createConnectOptions({
@@ -34,7 +35,8 @@ module JVM {
         port: 8181,
         userName: '',
         password: '',
-        useProxy: !$scope.disableProxy
+        useProxy: !$scope.disableProxy,
+        useKeycloak: false
       })
     };
 
@@ -45,6 +47,8 @@ module JVM {
     $scope.disableProxy = !hasMBeans || Core.isChromeApp();
 
     $scope.lastConnection = '';
+
+    $scope.keycloakEnabled = keycloakContext.enabled;
 
     // load settings like current tab, last used connection
     if (connectControllerKey in localStorage) {
@@ -106,17 +110,30 @@ module JVM {
         },
         userName: <Forms.FormElement> {
           type: "java.lang.String",
-          tooltip: "The user name to be used when connecting to Jolokia"
+          tooltip: "The user name to be used when connecting to Jolokia",
+          "control-attributes": {
+            "ng-hide": "currentConfig.useKeycloak"
+          }
         },
         password: <Forms.FormElement> {
           type: "password",
-          tooltip: "The password to be used when connecting to Jolokia"
+          tooltip: "The password to be used when connecting to Jolokia",
+          "control-attributes": {
+            "ng-hide": "currentConfig.useKeycloak"
+          }
         },
         useProxy: <Forms.FormElement> {
           type: "java.lang.Boolean",
           tooltip: "Whether or not we should use a proxy. See more information in the panel to the left.",
           "control-attributes": {
             "ng-hide": "disableProxy"
+          }
+        },
+        useKeycloak: <Forms.FormElement> {
+          type: "java.lang.Boolean",
+          tooltip: "If true, then keycloak access token will be used to secure connection to remote jolokia agent. Username and password are ignored in this case",
+          "control-attributes": {
+            "ng-hide": "!keycloakEnabled"
           }
         }
       }

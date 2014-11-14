@@ -116,6 +116,9 @@ module Core {
     postLoginTasks.addTask("ResetPreLogoutTasks", () => {
       preLogoutTasks.reset();
     });
+    postLoginTasks.addTask("ResetPostLogoutTasks", () => {
+      postLogoutTasks.reset();
+    });
 
     preLogoutTasks.addTask("ResetPostLoginTasks", () => {
       postLoginTasks.reset();
