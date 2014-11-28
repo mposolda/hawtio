@@ -94,7 +94,10 @@ features:install hawtio-keycloak
 
 9) Go to "http://localhost:8181" (or "http://localhost:8181/hawtio" on karaf) and login in keycloak as root or john to see hawtio admin console. If you login as mary, you should receive 'forbidden' error in hawtio
 
-10) If you want to enable SSH login based on user credentials from keycloak, then you can also change these 2 properties (really needed just for SSH, not for hawtio) 
+SSH authentication with keycloak credentials
+--------------------------------------------
+
+1) If you want to enable SSH login based on user credentials from keycloak, then you can also change these 2 properties (really needed just for SSH, not for hawtio) 
 in file $FUSE_HOME/etc/org.apache.karaf.shell.cfg:
 
 ```shell
@@ -102,7 +105,7 @@ sshRealm=keycloak
 sshRole=org.keycloak.adapters.jaas.RolePrincipal:admin
 ````
 
-Now let's type this from your terminal:
+2) Now let's type this from your terminal:
 
 ```shell
 ssh -p 8101 root@localhost
@@ -110,10 +113,27 @@ ssh -p 8101 root@localhost
 
 And login with password 'password' . Note that users john and mary don't have SSH access as they don't have 'admin' role. 
 
-NOTE: For fuse I needed to explicitly disable public key authentication by:
+NOTE: For fuse I needed to explicitly disable public key authentication by (this may not be needed in all environments):
 ```shell
 ssh -o PubkeyAuthentication=no -p 8101 root@localhost
 ````
+
+JMX authentication with keycloak credentials
+--------------------------------------------
+This may be needed just in case if you really want to use jconsole or other external tool to perform remote connection to JMX through RMI. Otherwise it may 
+be better to use just hawtio/jolokia as jolokia agent is installed in hawtio by default.
+ 
+1) In file $FUSE_HOME/etc/org.apache.karaf.management.cfg you can change these 2 properties:
+jmxRealm=keycloak
+jmxRole=org.keycloak.adapters.jaas.RolePrincipal:admin
+
+2) In jconsole you can fill URL like:
+
+service:jmx:rmi://localhost:44444/jndi/rmi://localhost:1099/karaf-root
+
+and credentials: root/password
+
+Note again that john and mary are not able to login as they don't have admin role.
 
 Hawtio integration on standalone Jetty or Tomcat
 -----------------------------------------
