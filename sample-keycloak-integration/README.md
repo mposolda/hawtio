@@ -5,11 +5,13 @@ Enable integration on Karaf or JBoss Fuse
 -----------------------------------------
 This was tested with Apache Karaf 2.3.9 and JBoss Fuse 6.1.0-redhat379 . 
 
-1) First checkout latest keycloak and build from sources
+1) First checkout latest keycloak and build from sources. It's also needed to build distribution where are osgi bundles
         
 ```shell
 git clone https://github.com/keycloak/keycloak.git
 cd $BASE_DIR/keycloak
+mvn clean install
+cd distribution
 mvn clean install
 ````
 
@@ -52,12 +54,10 @@ hawtio.keycloakEnabled=true
 hawtio.realm=keycloak
 hawtio.rolePrincipalClasses=org.keycloak.adapters.jaas.RolePrincipal
 hawtio.keycloakClientConfig=${karaf.base}/etc/keycloak-hawtio.json
-hawtio.keycloakServerConfig=${karaf.base}/etc/keycloak-hawtio.json
-fuse.directAuthKeycloakConfig=${karaf.base}/etc/keycloak-direct-access.json
 ````
 
 5) Copy keycloak-hawtio.json and keycloak-direct-access.json into fuse. File keycloak-hawtio.json is currently used for adapters 
-on both client (keycloak.js) and server (JAAS Login module) side.
+on both client (keycloak.js) and server (JAAS Login module) side. The file keycloak-direct-access.json is used for authentication of SSH or JMX RMI access with keycloak (actually not needed for hawtio).
 
 ```shell
 cp $BASE_DIR/hawtio/sample-keycloak-integration/keycloak-hawtio.json $FUSE_HOME/etc/
@@ -89,7 +89,13 @@ features:removeurl mvn:io.hawt/hawtio-karaf/1.2-redhat-379/xml/features
 ```shell
 features:addurl mvn:io.hawt/hawtio-karaf/1.5-SNAPSHOT/xml/features
 features:install hawtio
-features:install hawtio-keycloak
+````
+
+9) Install keycloak into karaf/fuse
+
+```shell
+features:addurl mvn:org.keycloak/keycloak-osgi-features/1.1.0.Beta2-SNAPSHOT/xml/features
+features:install keycloak-jaas
 ````
 
 9) Go to "http://localhost:8181" (or "http://localhost:8181/hawtio" on karaf) and login in keycloak as root or john to see hawtio admin console. If you login as mary, you should receive 'forbidden' error in hawtio
@@ -108,15 +114,11 @@ sshRole=org.keycloak.adapters.jaas.RolePrincipal:admin
 2) Now let's type this from your terminal:
 
 ```shell
-ssh -p 8101 root@localhost
+ssh -o PubkeyAuthentication=no -p 8101 root@localhost
 ````
 
 And login with password 'password' . Note that users john and mary don't have SSH access as they don't have 'admin' role. 
 
-NOTE: For fuse I needed to explicitly disable public key authentication by (this may not be needed in all environments):
-```shell
-ssh -o PubkeyAuthentication=no -p 8101 root@localhost
-````
 
 JMX authentication with keycloak credentials
 --------------------------------------------
@@ -124,16 +126,22 @@ This may be needed just in case if you really want to use jconsole or other exte
 be better to use just hawtio/jolokia as jolokia agent is installed in hawtio by default.
  
 1) In file $FUSE_HOME/etc/org.apache.karaf.management.cfg you can change these 2 properties:
+
+```shell
 jmxRealm=keycloak
 jmxRole=org.keycloak.adapters.jaas.RolePrincipal:admin
+````
 
 2) In jconsole you can fill URL like:
 
+```shell
 service:jmx:rmi://localhost:44444/jndi/rmi://localhost:1099/karaf-root
+````
 
 and credentials: root/password
 
-Note again that john and mary are not able to login as they don't have admin role.
+Note again that john and mary are not able to login as they don't have admin role. Note that 'john' is still able to access MBeans remotely via HTTP (Hawtio), so MBeans 
+are defacto not protected for him to see them.
 
 Hawtio integration on standalone Jetty or Tomcat
 -----------------------------------------

@@ -189,7 +189,6 @@
     <module>hawtio-fabric8-branding</module>
     <module>hawtio-karaf</module>
     <module>hawtio-custom-app</module>
-    <module>hawtio-keycloak</module>
   </modules>
 
   <build>
